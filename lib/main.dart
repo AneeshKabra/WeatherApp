@@ -18,7 +18,7 @@ class weatherwidget extends StatefulWidget {
 class _weatherwidgetState extends State<weatherwidget> {
   double latitude = 0;
   double longitude = 0;
-  List weather_desc = [];
+  String weather_desc = '';
   int temperature = 0;
   int feelsliketemp = 0;
   int maxtemp = 0;
@@ -26,6 +26,7 @@ class _weatherwidgetState extends State<weatherwidget> {
   String city = '';
   String weather_icon = '';
   Image? image;
+  Color? colour;
 
   Future _determinePosition() async {
     bool serviceenabled;
@@ -65,13 +66,18 @@ class _weatherwidgetState extends State<weatherwidget> {
       var temp_min = jsonDecode(data)['main']['temp_min'];
       String icon = jsonDecode(data)['weather'][0]['icon'];
       setState(() {
-        weather_desc = (weather_description.toUpperCase()).split(' ');
+        weather_desc = weather_description.toUpperCase();
         city = city_name;
         temperature = (temp - 273.15).toInt();
         feelsliketemp = (feels_like_temp - 273.15).toInt();
         weather_icon = icon + '@2x.png';
         maxtemp = (temp_max - 273.15).toInt();
         mintemp = (temp_min - 273.15).toInt();
+        if (weather_icon[2] == 'd') {
+          colour = Colors.lightBlue;
+        } else {
+          colour = Colors.indigo[900];
+        }
       });
     } else {
       print(response.statusCode);
@@ -90,18 +96,17 @@ class _weatherwidgetState extends State<weatherwidget> {
     getdata();
     return MaterialApp(
       home: Scaffold(
-          backgroundColor: Colors.indigo[600],
+          backgroundColor: colour,
           body: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
-              Padding(
-                padding: EdgeInsets.only(left: 10.0, top: 20.0),
+              SafeArea(
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    '''${weather_desc[0]}
-${weather_desc[1]}''',
+                    weather_desc,
                     style: TextStyle(
-                      fontSize: 40.0,
+                      fontSize: 30.0,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
@@ -111,12 +116,12 @@ ${weather_desc[1]}''',
               Center(
                 child: SizedBox(
                   height: 420.0,
-                  child: Image.asset('assets/images/$weather_icon',
+                  child: Image.asset('assets/images/01d@2x.png',
                       fit: BoxFit.fitWidth),
                 ),
               ),
               Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   Padding(
                     padding: EdgeInsets.only(left: 10.0),
@@ -133,7 +138,7 @@ ${weather_desc[1]}''',
                         Text(
                           '${temperature.toString()}°C',
                           style: TextStyle(
-                            fontSize: 50cd c.0,
+                            fontSize: 50.0,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
                           ),
@@ -149,52 +154,56 @@ ${weather_desc[1]}''',
                       ],
                     ),
                   ),
-                  SizedBox(
-                    width: 140.0,
-                  ),
-                  Column(
+                  Row(
                     children: <Widget>[
-                      Text(
-                        'Max',
-                        style: TextStyle(
-                          fontSize: 20.0,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
+                      Column(
+                        children: <Widget>[
+                          Text(
+                            'Max',
+                            style: TextStyle(
+                              fontSize: 20.0,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                          Text(
+                            '$maxtemp°C',
+                            style: TextStyle(
+                              fontSize: 20.0,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
                       ),
-                      Text(
-                        '$maxtemp°C',
-                        style: TextStyle(
-                          fontSize: 20.0,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
+                      SizedBox(
+                        width: 30.0,
                       ),
+                      Column(
+                        children: <Widget>[
+                          Text(
+                            'Min',
+                            style: TextStyle(
+                              fontSize: 20.0,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                          Text(
+                            '$mintemp°C',
+                            style: TextStyle(
+                              fontSize: 20.0,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(
+                        width: 10.0,
+                      )
                     ],
-                  ),
-                  SizedBox(
-                    width: 30.0,
-                  ),
-                  Column(
-                    children: <Widget>[
-                      Text(
-                        'Min',
-                        style: TextStyle(
-                          fontSize: 20.0,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                      Text(
-                        '$mintemp°C',
-                        style: TextStyle(
-                          fontSize: 20.0,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ],
-                  ),
+                  )
                 ],
               ),
             ],
